@@ -34,24 +34,6 @@ public static partial class GFunc
         return searchResult;
     }       //FindChildObj()
 
-    //! 특정 오브젝트의 자식 오브젝트를 서치해서 찾아주는 함수
-    // private static GameObject GetChildObj(this GameObject targetObj_, string objName_)
-    // {
-    //     GameObject searchResult = default;
-    //     for (int i = 0; i < targetObj_.transform.childCount; i++)
-    //     {
-    //         if (targetObj_.transform.GetChild(i).
-    //         gameObject.name.Equals(objName_))
-    //         {
-    //             return searchResult = targetObj_.transform.GetChild(i).gameObject;
-    //         }   //if: 타겟 오브젝트에서 이름이 같은 오브젝트를 찾아서 리턴
-    //         else { continue; }
-    //     }   //loop
-
-    //     //이름이 같은 오브젝트를 못찾을 경우 default값 리턴
-    //     return searchResult;
-    // }       //GetChildObj()
-
     //! 씬의 루트 오브젝트를 서치해서 찾아주는 함수
     public static GameObject GetRootObj(string objName_)
     {
@@ -78,4 +60,38 @@ public static partial class GFunc
         Scene activeScene = SceneManager.GetActiveScene();
         return activeScene;
     }   //GetActiveScene()
+
+    //T : 제네릭이라 하며 아래 내가 원하는 타입으로 변경할수 있다. (맞춰만 주면 아무 단어나 가능하다 T => AniType, G ...)
+    public static T GetComponentMust<T>(this GameObject obj)
+    {
+        T Component_ = obj.GetComponent<T>();
+        //as 만약 부모클래스 중 해당 클래스를 상속 받았다면 그 부분만 사용하겠다.
+        //만약 Component_ 가 AudioSource Component 라면 결국 Component 의 자식들 중 하나이기때문에
+        //Component로 보고 비교 할수 있게 한다.
+        //제네릭 default 를 통해 만들 수 있다.
+        //bool isComponentValid = Component_.Equals(null) == false;
+        //bool isComponentValid = ((Component)(Component_ as Component)).IsValid();
+        GFunc.Assert(Component_.IsValid<T>() != false,
+        string.Format("{0}에서 {1}을(를) 찾을 수 없습니다.", obj.name, Component_.GetType().Name));
+
+        return Component_;
+    }
+
+    //! 트랜스폼을 사용해서 오브젝트를 움직이는 함수
+    public static void Translate(this Transform transform_, Vector2 moveVector)
+    {
+        transform_.Translate(moveVector.x, moveVector.y, 0f);
+    }   //Translate()
+
+    //! RectTransform 에서 sizeDelta를 찾아서 리턴하는 함수
+    public static Vector2 GetRectSizeDelta(this GameObject obj_)
+    {
+        return obj_.GetComponentMust<RectTransform>().sizeDelta;
+    }   //GetRectSizeDelta()
+
+    //! 오브젝트의 로컬 포지션을 변경하는 함수
+    public static void SetLocalPos(this GameObject obj_, float x, float y, float z)
+    {
+        obj_.transform.localPosition = new Vector3(x, y, z);
+    }
 }
