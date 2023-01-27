@@ -68,7 +68,7 @@ public static partial class GFunc
         Debug.Log(a + b);
     }
 
-    public static void LoadScene_(string scene_name)
+    public static void LoadScene(string scene_name)
     {
         SceneManager.LoadScene(scene_name);
     }
